@@ -6,6 +6,7 @@
 #include "../console/console.h"
 #include "driver/gpio.h"
 #include "soc/gpio_struct.h"
+#include "soc/adc_channel.h"
 
 #include "adc.h"
 #include "driver/adc.h"
@@ -17,17 +18,17 @@
 4090 - 1970
 */
 /*
-4.1 - на зарядке
-4.07 - заряжена
+4.1 - пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+4.07 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 4 - 100%
 3.6 - 50%
-3.2 - разряжен
+3.2 - пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 */
 #define A	1.89
 #define B	360
 
-#define ADC_BATTERY_CHANNEL		ADC1_GPIO35_CHANNEL		// Канал АЦП, используемый для измерения напряжения на аккумуляторе
-#define NO_OF_SAMPLES			4//8
+#define ADC_BATTERY_CHANNEL		ADC1_GPIO35_CHANNEL
+#define NO_OF_SAMPLES			4
 
 
 static esp_adc_cal_characteristics_t *adc_chars;
@@ -83,7 +84,7 @@ esp_err_t init_adc()
 	esp_err_t err = ESP_OK;
 	uint16_t Vref = 1100;
 
-	console_printf(MsgInfo, "Инициализация АЦП для измерения VBAT (ADC1, channel=%d, 0 db, Vref=%d V)\r\n", ADC_BATTERY_CHANNEL, Vref);
+	console_printf(MsgInfo, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ VBAT (ADC1, channel=%d, 0 db, Vref=%d V)\r\n", ADC_BATTERY_CHANNEL, Vref);
 	console_pause(100);
 
     //Check if Two Point or Vref are burned into eFuse
@@ -93,14 +94,14 @@ esp_err_t init_adc()
     err = adc1_config_width(ADC_WIDTH_BIT_12);
     if (err != ESP_OK)
     {
-    	console_printf(MsgError, "Функция adc1_config_width() вернула код ошибки: %d\r\n", err);
+    	console_printf(MsgError, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ adc1_config_width() пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: %d\r\n", err);
     	return err;
     }
 
     err = adc1_config_channel_atten(ADC_BATTERY_CHANNEL, ADC_ATTEN_DB_6);
     if (err != ESP_OK)
     {
-    	console_printf(MsgError, "Функция adc1_config_channel_atten() вернула код ошибки: %d\r\n", err);
+    	console_printf(MsgError, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ adc1_config_channel_atten() пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ: %d\r\n", err);
     	return err;
     }
 
@@ -108,7 +109,7 @@ esp_err_t init_adc()
     esp_adc_cal_value_t val_type = esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_6, ADC_WIDTH_BIT_12, Vref, adc_chars);
     print_char_val_type(val_type);
 
-    console_printf(MsgInfo, "АЦП для измерения VBAT инициализирован\r\n");
+    console_printf(MsgInfo, "пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ VBAT пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ\r\n");
 	console_pause(300);
 
 	return err;

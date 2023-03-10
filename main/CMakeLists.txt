@@ -1,4 +1,15 @@
-set(COMPONENT_SRCS "main.c")
-set(COMPONENT_ADD_INCLUDEDIRS "")
+idf_build_get_property(project_dir PROJECT_DIR)
 
-register_component()
+idf_component_register(
+SRC_DIRS 
+"adc"
+"console"
+"display"
+"display/fonts"
+"hqx"
+"ili9341" 
+"mlx90640"
+"palette" 
+"save"
+"."
+)
