@@ -3,7 +3,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <esp_spi_flash.h>
-#include <esp_spiram.h>
+#include <esp32/spiram.h>
 #include "mlx90640/MLX90640_API.h"
 #include "console/console.h"
 #include "display/dispcolor.h"
@@ -27,8 +27,6 @@ void app_main()
     esp_chip_info_t chip_info;
     esp_chip_info(&chip_info);
     console_printf(MsgInfo, "ESP32 rev. %d (%d CPU cores, WiFi%s%s), ", chip_info.revision, chip_info.cores, (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "", (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
-    console_printf(MsgInfo, " %d MB %s SPI FLASH\n", spi_flash_get_chip_size() / (1024 * 1024), (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
-    console_printf(MsgInfo, " %d MB SPI PSRAM\n", esp_spiram_get_size() / (1024 * 1024));
     console_pause(300);
 
     // Инициализация АЦП

@@ -3,7 +3,6 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := mlx90640_ThermalImager
+PROJECT_NAME := mlx90640_thermoimager
 
 include $(IDF_PATH)/make/project.mk
-
