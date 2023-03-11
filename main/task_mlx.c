@@ -2,13 +2,11 @@
 #include <string.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include "mlx90640/mlx90640_api.h"
+#include "mlx90640/MLX90640_API.h"
 #include "adc/adc.h"
 #include "settings.h"
 #include "main.h"
 #include "task_mlx.h"
-
-
 
 paramsMLX90640 params;
 uint16_t *Frame;
@@ -16,9 +14,8 @@ sMlxData MlxData[2];
 uint8_t MlxDataIdx = 0;
 uint8_t MlxError = 0;
 
-
 //==============================================================================
-// Процедура копирует матрицу температур в буфер pBuff
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ pBuff
 //==============================================================================
 void GetThermoData(float *pBuff)
 {
@@ -28,10 +25,9 @@ void GetThermoData(float *pBuff)
 }
 //==============================================================================
 
-
 void mlx_task(void* arg)
 {
-    // Чтение параметров mlx90640 из EEPROM
+    // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ mlx90640 пїЅпїЅ EEPROM
 	int result = MLX90640_DumpEE(0x33, Frame); //the whole EEPROM is stored in the eeMLX90640 array
 
     if (result < 0)
@@ -49,7 +45,7 @@ void mlx_task(void* arg)
         return;
     }
 
-    // Установка частоты обновления термограммы
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     result = MLX90640_SetRefreshRate(0x33, FPS_Idx);
     if (result < 0)
     {
@@ -68,28 +64,28 @@ void mlx_task(void* arg)
 
 		if (FPS_Idx != FPS_Idx_Old)
 		{
-		    // Установка частоты обновления термограммы
+		    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 		    result = MLX90640_SetRefreshRate(0x33, FPS_Idx);
 		    if (!result)
 		    	FPS_Idx_Old = FPS_Idx;
 		}
 
-		// Чтение 2 субстраниц данных из сенсора
+		// пїЅпїЅпїЅпїЅпїЅпїЅ 2 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         for (uint8_t subPage = 0 ; subPage < 2 ; subPage++)
         {
-        	// Чтение фрейма из сенсора
+        	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         	result = MLX90640_GetFrameData(0x33, Frame);
 
-        	// Считаем и выводим несколько параметров, считанных из mlx90640
+        	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ mlx90640
         	pMlxData->Vdd = MLX90640_GetVdd(Frame, &params);
         	pMlxData->Ta = MLX90640_GetTa(Frame, &params);
 
-        	// Расчёт матрицы температур
+        	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         	float tr = pMlxData->Ta - 8;
         	MLX90640_CalculateTo(Frame, &params, Emissivity, tr, pMlxData->ThermoImage);
         }
 
-    	// Считаем температуру в центре экрана
+    	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         pMlxData->CenterTemp =
     			ThermoImage[termWidth * ((termHeight >> 1) - 1) + ((termWidth >> 1) - 1)] +
     			ThermoImage[termWidth * ((termHeight >> 1) - 1) + (termWidth >> 1)] +
@@ -97,7 +93,7 @@ void mlx_task(void* arg)
 				ThermoImage[termWidth * (termHeight >> 1) + (termWidth >> 1)];
         pMlxData->CenterTemp /= 4;
 
-    	// Поиск минимальной и максимальной температуры в кадре
+    	// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
         pMlxData->minT = 300;
         pMlxData->maxT = -40;
 

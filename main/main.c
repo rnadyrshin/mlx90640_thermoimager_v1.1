@@ -4,7 +4,7 @@
 #include <freertos/task.h>
 #include <esp_spi_flash.h>
 #include <esp_spiram.h>
-#include "mlx90640/mlx90640_api.h"
+#include "mlx90640/MLX90640_API.h"
 #include "console/console.h"
 #include "display/dispcolor.h"
 #include "adc/adc.h"
