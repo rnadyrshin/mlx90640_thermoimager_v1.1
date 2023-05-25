@@ -2,7 +2,7 @@
 #include <string.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include "mlx90640/MLX90640_API.h"
+#include "mlx90640/mlx90640_api.h"
 #include "adc/adc.h"
 #include "settings.h"
 #include "main.h"

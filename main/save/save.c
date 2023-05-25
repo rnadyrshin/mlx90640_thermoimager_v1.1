@@ -3,8 +3,9 @@
 #include <string.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <esp_spi_flash.h>
-#include <esp_spiram.h>
+//#include <esp_spi_flash.h>
+//#include <esp_spiram.h>
+#include <esp32/spiram.h>
 #include "../console/console.h"
 #include "../display/dispcolor.h"
 #include "../messagebox.h"
@@ -38,14 +39,14 @@ static int32_t GetLastIndex(char *pExtensionStr)
 {
 	int32_t maxFileIndex = 0;
     DIR *dr = opendir("/sdcard");
-    if (dr == NULL)	// Не удалось открыть папку
+    if (dr == NULL)	// пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
         return -1;
 
-    // Поиск на флешке BMP-файла с максимальным индексом в имени
+    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ BMP-пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
 	struct dirent *de;  // Pointer for directory entry
     while ((de = readdir(dr)) != NULL)
     {
-    	if (de->d_type == 1 && strstr(de->d_name, pExtensionStr))	// Рассматриваем только файлы с расширением pExtensionStr
+    	if (de->d_type == 1 && strstr(de->d_name, pExtensionStr))	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ pExtensionStr
     	{
    			uint32_t FileIndex = atoi(de->d_name);
    			if (FileIndex > maxFileIndex)
@@ -73,32 +74,32 @@ static void WriteBmpFileHeaderCore(FILE* f, uint8_t bitsPerPixel, uint16_t width
 	uint32_t fileSize = pixelDataOffset + width * height;
 	fileSize *= bitsPerPixel / 8;
 
-	// Заполнение структуры BITMAPFILEHEADER
-	// Сигнатура файла "BM"
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ BITMAPFILEHEADER
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ "BM"
 	uint16 = 0x4D42;
 	fwrite(&uint16, 2, 1, f);
-	// Размер файла
+	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	buff32 = fileSize;
 	fwrite(&buff32, 4, 1, f);
-	// 2 резервных слова
+	// 2 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	uint16 = 0;
 	fwrite(&uint16, 2, 1, f);
 	uint16 = 0;
 	fwrite(&uint16, 2, 1, f);
-	// Смещение данных о точках относительно начала структуры BITMAPFILEHEADER (и самого файла)
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ BITMAPFILEHEADER (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ)
 	buff32 = pixelDataOffset;
 	fwrite(&buff32, 4, 1, f);
 
-	// Заполнение структуры BITMAPCOREHEADER
-	buff32 = 12;	// Размер этой структуры (определяет версию структуры
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ BITMAPCOREHEADER
+	buff32 = 12;	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	fwrite(&buff32, 4, 1, f);
-	// Ширина и высота растра
+	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	fwrite(&width, 2, 1, f);
 	fwrite(&height, 2, 1, f);
-	// Поле Planes (всегда = 1 для BMP)
+	// пїЅпїЅпїЅпїЅ Planes (пїЅпїЅпїЅпїЅпїЅпїЅ = 1 пїЅпїЅпїЅ BMP)
 	uint16 = 1;
 	fwrite(&uint16, 2, 1, f);
-	// Поле BitCount
+	// пїЅпїЅпїЅпїЅ BitCount
 	uint16 = 32;// bitsPerPixel;
 	fwrite(&uint16, 2, 1, f);
 }
@@ -118,53 +119,53 @@ static void WriteBmpFileHeader3(FILE* f, uint8_t bitsPerPixel, uint16_t width, u
 	uint32_t fileSize = pixelDataOffset + width * height;
 	fileSize *= bitsPerPixel / 8;
 
-	// Заполнение структуры BITMAPFILEHEADER
-	// Сигнатура файла "BM"
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ BITMAPFILEHEADER
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ "BM"
 	uint16 = 0x4D42;
 	fwrite(&uint16, 2, 1, f);
-	// Размер файла
+	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	uint32 = fileSize;
 	fwrite(&uint32, 4, 1, f);
-	// 2 резервных слова
+	// 2 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	uint16 = 0;
 	fwrite(&uint16, 2, 1, f);
 	uint16 = 0;
 	fwrite(&uint16, 2, 1, f);
-	// Смещение данных о точках относительно начала структуры BITMAPFILEHEADER (и самого файла)
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ BITMAPFILEHEADER (пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ)
 	uint32 = pixelDataOffset;
 	fwrite(&uint32, 4, 1, f);
 
-	// Заполнение структуры BITMAPCOREHEADER
-	uint32 = 40;	// Размер этой структуры (определяет версию структуры)
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ BITMAPCOREHEADER
+	uint32 = 40;	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
 	fwrite(&uint32, 4, 1, f);
-	// Поле biWidth
+	// пїЅпїЅпїЅпїЅ biWidth
 	int32 = width;
 	fwrite(&int32, 4, 1, f);
-	// Поле biHeight
+	// пїЅпїЅпїЅпїЅ biHeight
 	int32 = height;
 	fwrite(&int32, 4, 1, f);
-	// Поле Planes (всегда = 1 для BMP)
+	// пїЅпїЅпїЅпїЅ Planes (пїЅпїЅпїЅпїЅпїЅпїЅ = 1 пїЅпїЅпїЅ BMP)
 	uint16 = 1;
 	fwrite(&uint16, 2, 1, f);
 	// biBitCount
 	uint16 = 16;
 	fwrite(&uint16, 2, 1, f);
 	// biCompression
-	uint32 = 0;	// Без компрессии
+	uint32 = 0;	// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	fwrite(&uint32, 4, 1, f);
 	// biSizeImage
-	uint32 = 0;	// 0 если компрессия не используется
+	uint32 = 0;	// 0 пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	fwrite(&uint32, 4, 1, f);
-	// Поле biXPelsPerMeter
+	// пїЅпїЅпїЅпїЅ biXPelsPerMeter
 	int32 = 0;
 	fwrite(&int32, 4, 1, f);
-	// Поле biYPelsPerMeter
+	// пїЅпїЅпїЅпїЅ biYPelsPerMeter
 	int32 = 0;
 	fwrite(&int32, 4, 1, f);
-	// Поле biClrUsed
+	// пїЅпїЅпїЅпїЅ biClrUsed
 	uint32 = 0;
 	fwrite(&uint32, 4, 1, f);
-	// Поле biClrImportant
+	// пїЅпїЅпїЅпїЅ biClrImportant
 	uint32 = 0;
 	fwrite(&uint32, 4, 1, f);
 }
@@ -202,7 +203,7 @@ static void WriteCsvRow(FILE* f, uint16_t width, float *pValues)
 {
 	for (int col = 0; col < width; col++)
 	{
-		if (col == width - 1)	// Последнее значение в строке?
+		if (col == width - 1)	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ?
 			fprintf(f, "%f\r\n", pValues[col]);
 		else
 			fprintf(f, "%f, ", pValues[col]);
@@ -213,28 +214,28 @@ static void WriteCsvRow(FILE* f, uint16_t width, float *pValues)
 #define SAVE_BMP_WINDOW_WIDTH		200
 
 //==============================================================================
-// Функция сохранения текущей термограммы на карту SD
-// (формат CSV, разделитель значений - запятая)
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ SD
+// (пїЅпїЅпїЅпїЅпїЅпїЅ CSV, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
 //==============================================================================
 int save_ImageCSV(void)
 {
 	char fileExtension[] = ".CSV";
 
-	// Инициализация карты на случай если она не была инициализирована или вынималась после инициализации
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	sd_CardInit();
 
 	int32_t maxFileIndex = GetLastIndex(fileExtension);
-	if (maxFileIndex < 0)	// Не удалось открыть папку
+	if (maxFileIndex < 0)	// пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     {
-		message_show(SAVE_CSV_WINDOW_WIDTH, FONTID_6X8M, "Ошибка при сохранении", "Ошибка доступа к карте SD", RED, 1, 1000);
+		message_show(SAVE_CSV_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ SD", RED, 1, 1000);
 	    return -1;
     }
 
-	// Выделяем временный буфер в памяти для хранения значений
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	float *pValues = heap_caps_malloc((termWidth * termHeight) << 2, MALLOC_CAP_SPIRAM);
 	if (!pValues)
 	{
-		message_show(SAVE_CSV_WINDOW_WIDTH, FONTID_6X8M, "Ошибка при сохранении", "Недостаточно ОЗУ!", RED, 1, 1000);
+		message_show(SAVE_CSV_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ!", RED, 1, 1000);
 		return -1;
 	}
 
@@ -243,8 +244,8 @@ int save_ImageCSV(void)
     maxFileIndex++;
 
 	char message[32];
-	GetStringF(message, "Сохранение в файл %05d%s", maxFileIndex, fileExtension);
-	progress_start_show(SAVE_CSV_WINDOW_WIDTH, FONTID_6X8M, "Сохранение термограммы", message, GREEN, 0, 0);
+	GetStringF(message, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ %05d%s", maxFileIndex, fileExtension);
+	progress_start_show(SAVE_CSV_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", message, GREEN, 0, 0);
 
 	char fileName[18];
 	GetStringF(fileName, "/sdcard/%05d%s", maxFileIndex, fileExtension);
@@ -252,7 +253,7 @@ int save_ImageCSV(void)
 	FILE* f = fopen(fileName, "w");
 	if (f == NULL)
 	{
-		message_show(SAVE_CSV_WINDOW_WIDTH, FONTID_6X8M, "Ошибка при сохранении", "Ошибка записи файла на карту SD!", RED, 1, 1000);
+		message_show(SAVE_CSV_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ SD!", RED, 1, 1000);
 		heap_caps_free(pValues);
 		return -1;
 	}
@@ -260,11 +261,11 @@ int save_ImageCSV(void)
 	for (uint8_t step = 0; step < 24; step++)
 	{
 		WriteCsvRow(f, termWidth, &pValues[step * termWidth]);
-		progress_show(SAVE_CSV_WINDOW_WIDTH, FONTID_6X8M, "Сохранение термограммы", message, GREEN, step + 1, 24);
+		progress_show(SAVE_CSV_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", message, GREEN, step + 1, 24);
 	}
 
-	GetStringF(message, "Файл %05d%s успешно сохранён", maxFileIndex, fileExtension);
-	message_show(SAVE_CSV_WINDOW_WIDTH, FONTID_6X8M, "Сохранение термограммы", message, GREEN, 0, 1000);
+	GetStringF(message, "пїЅпїЅпїЅпїЅ %05d%s пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", maxFileIndex, fileExtension);
+	message_show(SAVE_CSV_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", message, GREEN, 0, 1000);
 
 	fclose(f);
 	fflush(f);
@@ -276,8 +277,8 @@ int save_ImageCSV(void)
 //==============================================================================
 
 //==============================================================================
-// Функция сохранения текущего кадра дисплея на карту SD
-// (16 битный формат BMP, фактически значащих бит только 15)
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ SD
+// (16 пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ BMP, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 15)
 //==============================================================================
 int save_ImageBMP_15bit(void)
 {
@@ -285,21 +286,21 @@ int save_ImageBMP_15bit(void)
 	uint16_t screenHeight = dispcolor_getHeight();
 	char fileExtension[] = ".BMP";
 
-	// Инициализация карты на случай если она не была инициализирована или вынималась после инициализации
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	sd_CardInit();
 
 	int32_t maxFileIndex = GetLastIndex(fileExtension);
-	if (maxFileIndex < 0)	// Не удалось открыть папку
+	if (maxFileIndex < 0)	// пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     {
-		message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "Ошибка при сохранении", "Ошибка доступа к карте SD", RED, 1, 1000);
+		message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ SD", RED, 1, 1000);
 	    return -1;
     }
 
-	// Выделяем временный буфер в памяти для хранения текущего кадра
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	uint16_t *pScreen = heap_caps_malloc((screenWidth * screenHeight) << 1, MALLOC_CAP_SPIRAM);//MALLOC_CAP_INTERNAL);
 	if (!pScreen)
 	{
-		message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "Ошибка при сохранении", "Недостаточно ОЗУ!", RED, 1, 1000);
+		message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ!", RED, 1, 1000);
 		return -1;
 	}
 
@@ -308,8 +309,8 @@ int save_ImageBMP_15bit(void)
     maxFileIndex++;
 
 	char message[32];
-	GetStringF(message, "Сохранение в файл %05d%s", maxFileIndex, fileExtension);
-	progress_start_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "Сохранение термограммы", message, GREEN, 0, 0);
+	GetStringF(message, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ %05d%s", maxFileIndex, fileExtension);
+	progress_start_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", message, GREEN, 0, 0);
 
 	char fileName[18];
 	GetStringF(fileName, "/sdcard/%05d%s", maxFileIndex, fileExtension);
@@ -317,7 +318,7 @@ int save_ImageBMP_15bit(void)
 	FILE* f = fopen(fileName, "w");
 	if (f == NULL)
 	{
-		message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "Ошибка при сохранении", "Ошибка записи файла на карту SD!", RED, 1, 1000);
+		message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ SD!", RED, 1, 1000);
 		heap_caps_free(pScreen);
 		return -1;
 	}
@@ -329,11 +330,11 @@ int save_ImageBMP_15bit(void)
 		for (int row = 0; row < 10; row++)
 			WriteBmpRow_15bit(f, screenWidth, &pScreen[(screenHeight - (step * 10 + row) - 1) * screenWidth]);
 
-		progress_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "Сохранение термограммы", message, GREEN, step + 1, 24);
+		progress_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", message, GREEN, step + 1, 24);
 	}
 
-	GetStringF(message, "Файл %05d%s успешно сохранён", maxFileIndex, fileExtension);
-	message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "Сохранение термограммы", message, GREEN, 0, 1000);
+	GetStringF(message, "пїЅпїЅпїЅпїЅ %05d%s пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", maxFileIndex, fileExtension);
+	message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", message, GREEN, 0, 1000);
 
 	fclose(f);
 	fflush(f);
@@ -345,8 +346,8 @@ int save_ImageBMP_15bit(void)
 //==============================================================================
 
 //==============================================================================
-// Функция сохранения текущего кадра дисплея на карту SD
-// (24 (32) битный формат BMP, фактически значащих бит только 16)
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ SD
+// (24 (32) пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ BMP, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 16)
 //==============================================================================
 int save_ImageBMP_24bit(void)
 {
@@ -354,21 +355,21 @@ int save_ImageBMP_24bit(void)
 	uint16_t screenHeight = dispcolor_getHeight();
 	char fileExtension[] = ".BMP";
 
-	// Инициализация карты на случай если она не была инициализирована или вынималась после инициализации
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	sd_CardInit();
 
 	int32_t maxFileIndex = GetLastIndex(fileExtension);
-	if (maxFileIndex < 0)	// Не удалось открыть папку
+	if (maxFileIndex < 0)	// пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     {
-		message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "Ошибка при сохранении", "Ошибка доступа к карте SD", RED, 1, 1000);
+		message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ SD", RED, 1, 1000);
 	    return -1;
     }
 
-	// Выделяем временный буфер в памяти для хранения текущего кадра
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	uint16_t *pScreen = heap_caps_malloc((screenWidth * screenHeight) << 1, MALLOC_CAP_SPIRAM);
 	if (!pScreen)
 	{
-		message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "Ошибка при сохранении", "Недостаточно ОЗУ!", RED, 1, 1000);
+		message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ!", RED, 1, 1000);
 		return -1;
 	}
 
@@ -377,8 +378,8 @@ int save_ImageBMP_24bit(void)
     maxFileIndex++;
 
 	char message[32];
-	GetStringF(message, "Сохранение в файл %05d%s", maxFileIndex, fileExtension);
-	progress_start_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "Сохранение термограммы", message, GREEN, 0, 0);
+	GetStringF(message, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ %05d%s", maxFileIndex, fileExtension);
+	progress_start_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", message, GREEN, 0, 0);
 
 	char fileName[18];
 	GetStringF(fileName, "/sdcard/%05d%s", maxFileIndex, fileExtension);
@@ -386,7 +387,7 @@ int save_ImageBMP_24bit(void)
 	FILE* f = fopen(fileName, "w");
 	if (f == NULL)
 	{
-		message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "Ошибка при сохранении", "Ошибка записи файла на карту SD!", RED, 1, 1000);
+		message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ SD!", RED, 1, 1000);
 		heap_caps_free(pScreen);
 		return -1;
 	}
@@ -398,11 +399,11 @@ int save_ImageBMP_24bit(void)
 		for (int row = 0; row < 10; row++)
 			WriteBmpRow_24bit(f, screenWidth, &pScreen[(screenHeight - (step * 10 + row) - 1) * screenWidth]);
 
-		progress_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "Сохранение термограммы", message, GREEN, step + 1, 24);
+		progress_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", message, GREEN, step + 1, 24);
 	}
 
-	GetStringF(message, "Файл %05d%s успешно сохранён", maxFileIndex, fileExtension);
-	message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "Сохранение термограммы", message, GREEN, 0, 1000);
+	GetStringF(message, "пїЅпїЅпїЅпїЅ %05d%s пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", maxFileIndex, fileExtension);
+	message_show(SAVE_BMP_WINDOW_WIDTH, FONTID_6X8M, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ", message, GREEN, 0, 1000);
 
 	fclose(f);
 	fflush(f);

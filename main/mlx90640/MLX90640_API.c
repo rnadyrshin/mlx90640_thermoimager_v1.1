@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#include "MLX90640_I2C_Driver.h"
-#include "MLX90640_API.h"
+#include "mlx90640_i2c_driver.h"
+#include "mlx90640_api.h"
 #include <math.h>
 
 void ExtractVDDParameters(uint16_t *eeData, paramsMLX90640 *mlx90640);

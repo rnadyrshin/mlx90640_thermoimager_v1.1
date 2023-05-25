@@ -2,9 +2,8 @@
 #include <string.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <esp_spi_flash.h>
 #include <esp32/spiram.h>
-#include "mlx90640/MLX90640_API.h"
+#include "mlx90640/mlx90640_api.h"
 #include "console/console.h"
 #include "display/dispcolor.h"
 #include "adc/adc.h"
@@ -14,7 +13,6 @@
 #include "task_mlx.h"
 #include "task_ui.h"
 #include "main.h"
-
 
 //==============================================================================
 void app_main()
