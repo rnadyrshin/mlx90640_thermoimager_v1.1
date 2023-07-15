@@ -14,7 +14,7 @@ sMlxData MlxData[2];
 uint8_t MlxDataIdx = 0;
 uint8_t MlxError = 0;
 
-static uint16_t badPixels[5] = 
+static uint16_t badPixels[] = 
 {
 	// 10,	// Bad pixel number 1
 	// 201,	// Bad pixel number 2
