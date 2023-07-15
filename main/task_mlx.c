@@ -14,6 +14,14 @@ sMlxData MlxData[2];
 uint8_t MlxDataIdx = 0;
 uint8_t MlxError = 0;
 
+static uint16_t badPixels[5] = 
+{
+	// 10,	// Bad pixel number 1
+	// 201,	// Bad pixel number 2
+	// 339,	// Bad pixel number 3
+	0xFFFF
+};
+
 //==============================================================================
 // ��������� �������� ������� ���������� � ����� pBuff
 //==============================================================================
@@ -84,6 +92,8 @@ void mlx_task(void* arg)
         	float tr = pMlxData->Ta - 8;
         	MLX90640_CalculateTo(Frame, &params, Emissivity, tr, pMlxData->ThermoImage);
         }
+
+        MLX90640_BadPixelsCorrection(badPixels, pMlxData->ThermoImage, 1, &params);   
 
     	// ������� ����������� � ������ ������
         pMlxData->CenterTemp =
